@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant C as Cliente
+    participant UC as UserController
+    participant US as UserService
+    participant UR as UserRepository
+    participant PR as PhoneRepository
+    participant JWT as JwtService
+    participant DB as H2 Database
+
+    Note over C,DB: Registro de Usuario
+    C->>+UC: POST /api/user/sign-up
+    UC->>+US: signUp(request)
+    US->>+UR: findByEmail(email)
+    UR->>+DB: SELECT user WHERE email=?
+    DB-->>-UR: Mono.empty()
+    UR-->>-US: Usuario no existe
+    US->>+UR: save(user)
+    UR->>+DB: INSERT INTO users
+    DB-->>-UR: Usuario guardado
+    UR-->>-US: Usuario con ID
+    US->>+JWT: generateToken(user)
+    JWT-->>-US: JWT Token
+    US->>+UR: save(userWithToken)
+    UR->>+DB: UPDATE user SET token=?
+    DB-->>-UR: Usuario actualizado
+    UR-->>-US: Usuario final
+    alt Con teléfonos
+        US->>+PR: saveAll(phones)
+        PR->>+DB: INSERT INTO phones
+        DB-->>-PR: Teléfonos guardados
+        PR-->>-US: Lista de teléfonos
+    end
+    US-->>-UC: UserResponseDTO
+    UC-->>-C: 201 Created + UserResponseDTO

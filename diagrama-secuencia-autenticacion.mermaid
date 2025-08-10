@@ -1,0 +1,56 @@
+sequenceDiagram
+    participant C as Cliente
+    participant LC as LoginController
+    participant LS as LoginService
+    participant JWT as JwtService
+    participant UR as UserRepository
+    participant PR as PhoneRepository
+    participant DB as H2 Database
+
+    Note over C,DB: Autenticación con Credenciales
+    C->>+LC: POST /api/login/authenticate
+    LC->>+LS: loginWithCredentials(request)
+    LS->>+UR: findByEmail(email)
+    UR->>+DB: SELECT user WHERE email=?
+    DB-->>-UR: Usuario encontrado
+    UR-->>-LS: Usuario existente
+    LS->>LS: validatePassword(password)
+    alt Contraseña válida
+        LS->>+JWT: generateToken(user)
+        JWT-->>-LS: Nuevo JWT Token
+        LS->>+UR: save(updatedUser)
+        UR->>+DB: UPDATE last_login, token
+        DB-->>-UR: Usuario actualizado
+        UR-->>-LS: Usuario guardado
+        LS->>+PR: findByUserId(userId)
+        PR->>+DB: SELECT phones WHERE user_id=?
+        DB-->>-PR: Lista de teléfonos
+        PR-->>-LS: Teléfonos del usuario
+        LS-->>-LC: UserResponseDTO
+        LC-->>-C: 200 OK + UserResponseDTO
+    else Contraseña inválida
+        LS-->>LC: ValidationException
+        LC-->>C: 400 Bad Request
+    end
+
+    Note over C,DB: Validación de Token
+    C->>+LC: GET /api/login/validate + Bearer Token
+    LC->>+LS: login(authHeader)
+    LS->>+JWT: validateTokenAndGetEmail(token)
+    JWT-->>-LS: Email del usuario
+    LS->>+UR: findByEmail(email)
+    UR->>+DB: SELECT user WHERE email=?
+    DB-->>-UR: Usuario encontrado
+    UR-->>-LS: Usuario existente
+    LS->>+JWT: generateToken(user)
+    JWT-->>-LS: Nuevo JWT Token
+    LS->>+UR: save(updatedUser)
+    UR->>+DB: UPDATE last_login, token
+    DB-->>-UR: Usuario actualizado
+    UR-->>-LS: Usuario guardado
+    LS->>+PR: findByUserId(userId)
+    PR->>+DB: SELECT phones WHERE user_id=?
+    DB-->>-PR: Lista de teléfonos
+    PR-->>-LS: Teléfonos del usuario
+    LS-->>-LC: UserResponseDTO
+    LC-->>-C: 200 OK + UserResponseDTO

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  bci-challenge-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bci-challenge-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JWT_SECRET=4qhq8LrEBfYcaRHxhdb9zURb2rf8e7Ud8GLO9L6brain2rvUKu7C
+      - JWT_EXPIRATION=86400000
+      - SPRING_R2DBC_URL=r2dbc:h2:mem:///userdb;DB_CLOSE_DELAY=-1
+      - SPRING_R2DBC_USERNAME=sa
+      - SPRING_R2DBC_PASSWORD=
+      - LOGGING_LEVEL_COM_BCI=DEBUG
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - bci-network
+
+networks:
+  bci-network:
+    driver: bridge

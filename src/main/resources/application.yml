@@ -1,0 +1,26 @@
+spring:
+  webflux:
+    base-path: /
+
+  r2dbc:
+    url: r2dbc:h2:mem:///userdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: NON_NULL
+
+jwt:
+  secret: "4qhq8LrEBfYcaRHxhdb9zURb2rf8e7Ud8GLO9L6brain2rvUKu7C"
+  expiration: 86400000  # 24 horas en milisegundos
+
+logging:
+  level:
+    root: INFO
+    org.springframework.r2dbc: DEBUG
+    com.bci: DEBUG
+    org.springframework.data.r2dbc: DEBUG
+    io.r2dbc.h2: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
