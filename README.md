@@ -447,93 +447,33 @@ sequenceDiagram
 ### 🏗️ Diagrama de Arquitectura
 
 ```mermaid
-graph TB
-    subgraph "Presentation Layer"
-        Client[Cliente HTTP/Mobile]
-        Swagger[Swagger UI]
-    end
+flowchart TD
+    A[Cliente] --> B[UserController]
+    A --> C[LoginController]
 
-subgraph "API Layer"
-UserController[UserController<br/>@RestController]
-LoginController[LoginController<br/>@RestController]
-GlobalHandler[GlobalExceptionHandler<br/>@RestControllerAdvice]
-end
+    B --> D[UserService]
+    C --> E[LoginService]
 
-subgraph "Security Layer"
-Security[Spring Security<br/>WebFlux Config]
-JWTFilter[JwtAuthenticationWebFilter<br/>Custom Filter]
-JWT[JwtService<br/>Token Management]
-end
+    D --> F[UserRepository]
+    E --> F
+    D --> G[PhoneRepository]
+    E --> G
 
-subgraph "Business Layer"
-UserService[UserService<br/>User Management]
-LoginService[LoginService<br/>Authentication]
-Mapper[UserMapper<br/>DTO ↔ Entity]
-Validator[Bean Validation<br/>Jakarta EE]
-end
+    F --> H[(H2 Database)]
+    G --> H
 
-subgraph "Data Layer"
-UserRepo[UserRepository<br/>@Repository]
-PhoneRepo[PhoneRepository<br/>@Repository]
-R2DBC[Spring Data R2DBC<br/>Reactive Database]
-end
+    B --> I[JWT Filter]
+    C --> I
+    I --> J[JwtService]
 
-subgraph "Database"
-H2[(H2 Database<br/>In-Memory)]
-end
+    D --> K[UserMapper]
+    E --> K
 
-subgraph "Infrastructure"
-Actuator[Spring Actuator<br/>Health Checks]
-Config[Configuration<br/>Properties]
-end
+    L[GlobalExceptionHandler] --> B
+    L --> C
 
-%% Connections
-Client -->|HTTP Requests| UserController
-Client -->|HTTP Requests| LoginController
-Swagger -->|API Documentation| UserController
-Swagger -->|API Documentation| LoginController
-
-UserController -->|Delegate| UserService
-LoginController -->|Delegate| LoginService
-UserController -->|Exception Handling| GlobalHandler
-LoginController -->|Exception Handling| GlobalHandler
-
-UserController -.->|Security Filter| Security
-LoginController -.->|Security Filter| Security
-Security -->|JWT Validation| JWTFilter
-JWTFilter -->|Validate Token| JWT
-
-UserService -->|Map DTOs| Mapper
-LoginService -->|Map DTOs| Mapper
-UserService -->|Validate Data| Validator
-LoginService -->|Validate Data| Validator
-UserService -->|Data Access| UserRepo
-LoginService -->|Data Access| UserRepo
-UserService -->|Data Access| PhoneRepo
-LoginService -->|Data Access| PhoneRepo
-UserService -->|Generate Token| JWT
-LoginService -->|Generate Token| JWT
-
-UserRepo -->|R2DBC Queries| R2DBC
-PhoneRepo -->|R2DBC Queries| R2DBC
-R2DBC -->|SQL Operations| H2
-
-Actuator -.->|Monitor| H2
-Config -.->|Configure| UserService
-Config -.->|Configure| LoginService
-
-%% Styling
-classDef controller fill:#e1f5fe
-classDef service fill:#f3e5f5
-classDef repository fill:#e8f5e8
-classDef database fill:#fff3e0
-classDef security fill:#ffebee
-
-class UserController,LoginController,GlobalHandler controller
-class UserService,LoginService,Mapper,JWT service
-class UserRepo,PhoneRepo,R2DBC repository
-class H2 database
-class Security,JWTFilter,Validator security
+    M[Spring Security] --> I
+    N[Actuator] --> H
 ```
 
 ## 📈 Métricas 
