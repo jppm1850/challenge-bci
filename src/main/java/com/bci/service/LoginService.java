@@ -9,6 +9,6 @@ import reactor.core.publisher.Mono;
 
 public interface LoginService {
 
-    Mono<ResponseEntity<UserResponseDTO>> login(String authHeader);
-    Mono<ResponseEntity<UserResponseDTO>> loginWithCredentials(LoginRequestDTO request);
+    Mono<ResponseEntity<Object>> login(String authHeader);
+    Mono<ResponseEntity<Object>> loginWithCredentials(LoginRequestDTO request);
 }

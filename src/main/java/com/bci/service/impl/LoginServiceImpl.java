@@ -39,21 +39,23 @@ public class LoginServiceImpl implements LoginService {
     private final UserMapper userMapper;
 
     @Override
-    public Mono<ResponseEntity<UserResponseDTO>> login(String authHeader) {
+    public Mono<ResponseEntity<Object>> login(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO("Authorization header required");
             return Mono.just(ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(null));
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body((Object) errorResponse));
         }
 
         String token = authHeader.substring(7);
         return processLogin(token)
-                .map(ResponseEntity::ok)
+                .map(userResponse -> ResponseEntity.ok((Object) userResponse))
                 .onErrorResume(e -> {
                     log.error("Error during login: {}", e.getMessage());
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(e.getMessage());
                     return Mono.just(ResponseEntity
                             .status(HttpStatus.UNAUTHORIZED)
-                            .body(null));
+                            .body((Object) errorResponse));
                 });
     }
 
@@ -77,9 +79,9 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public Mono<ResponseEntity<UserResponseDTO>> loginWithCredentials(LoginRequestDTO request) {
+    public Mono<ResponseEntity<Object>> loginWithCredentials(LoginRequestDTO request) {
         return processLoginWithCredentials(request)
-                .map(ResponseEntity::ok)
+                .map(userResponse -> ResponseEntity.ok((Object) userResponse))
                 .onErrorResume(e -> {
                     log.error("Error during credentials login: {}", e.getMessage());
 
@@ -90,9 +92,10 @@ public class LoginServiceImpl implements LoginService {
                         status = HttpStatus.BAD_REQUEST;
                     }
 
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(e.getMessage());
                     return Mono.just(ResponseEntity
                             .status(status)
-                            .body(null));
+                            .body((Object) errorResponse));
                 });
     }
 

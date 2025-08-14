@@ -28,13 +28,7 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        ErrorResponseDTO response = new ErrorResponseDTO(Collections.singletonList(
-                new ErrorResponseDTO.Error(
-                        new Timestamp(System.currentTimeMillis()),
-                        HttpStatus.BAD_REQUEST.value(),
-                        message
-                )
-        ));
+        ErrorResponseDTO response = new ErrorResponseDTO(message);
 
         return Mono.just(ResponseEntity.badRequest().body(response));
     }
@@ -43,13 +37,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ErrorResponseDTO>> handleUserExists(UserExistsException ex) {
         log.error("User already exists: {}", ex.getMessage());
 
-        ErrorResponseDTO response = new ErrorResponseDTO(Collections.singletonList(
-                new ErrorResponseDTO.Error(
-                        new Timestamp(System.currentTimeMillis()),
-                        HttpStatus.CONFLICT.value(),
-                        ex.getMessage()
-                )
-        ));
+        ErrorResponseDTO response = new ErrorResponseDTO(ex.getMessage());
 
         return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).body(response));
     }
@@ -58,13 +46,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ErrorResponseDTO>> handleUserNotFound(UserNotFoundException ex) {
         log.error("User not found: {}", ex.getMessage());
 
-        ErrorResponseDTO response = new ErrorResponseDTO(Collections.singletonList(
-                new ErrorResponseDTO.Error(
-                        new Timestamp(System.currentTimeMillis()),
-                        HttpStatus.NOT_FOUND.value(),
-                        ex.getMessage()
-                )
-        ));
+        ErrorResponseDTO response = new ErrorResponseDTO(ex.getMessage());
 
         return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(response));
     }
@@ -73,13 +55,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ErrorResponseDTO>> handleJwtException(Exception ex) {
         log.error("JWT error: {}", ex.getMessage());
 
-        ErrorResponseDTO response = new ErrorResponseDTO(Collections.singletonList(
-                new ErrorResponseDTO.Error(
-                        new Timestamp(System.currentTimeMillis()),
-                        HttpStatus.UNAUTHORIZED.value(),
-                        "Invalid or expired token"
-                )
-        ));
+        ErrorResponseDTO response = new ErrorResponseDTO("Invalid or expired token");
 
         return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
     }
@@ -88,13 +64,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ErrorResponseDTO>> handleValidationException(ValidationException ex) {
         log.error("Validation exception: {}", ex.getMessage());
 
-        ErrorResponseDTO response = new ErrorResponseDTO(Collections.singletonList(
-                new ErrorResponseDTO.Error(
-                        new Timestamp(System.currentTimeMillis()),
-                        HttpStatus.BAD_REQUEST.value(),
-                        ex.getMessage()
-                )
-        ));
+        ErrorResponseDTO response = new ErrorResponseDTO(ex.getMessage());
 
         return Mono.just(ResponseEntity.badRequest().body(response));
     }
@@ -103,13 +73,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ErrorResponseDTO>> handleGenericException(Exception ex) {
         log.error("Unexpected error: ", ex);
 
-        ErrorResponseDTO response = new ErrorResponseDTO(Collections.singletonList(
-                new ErrorResponseDTO.Error(
-                        new Timestamp(System.currentTimeMillis()),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        "An unexpected error occurred"
-                )
-        ));
+        ErrorResponseDTO response = new ErrorResponseDTO("An unexpected error occurred");
 
         return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
     }

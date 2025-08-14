@@ -51,14 +51,8 @@ public class UserServiceImpl implements UserService {
                         status = HttpStatus.BAD_REQUEST;
                     }
 
-                    return Mono.just(ResponseEntity.status(status)
-                            .body(new ErrorResponseDTO(List.of(
-                                    new ErrorResponseDTO.Error(
-                                            new Timestamp(System.currentTimeMillis()),
-                                            status.value(),
-                                            e.getMessage()
-                                    )
-                            ))));
+                    ErrorResponseDTO errorResponse = new ErrorResponseDTO(e.getMessage());
+                    return Mono.just(ResponseEntity.status(status).body((Object) errorResponse));
                 });
     }
 

@@ -65,7 +65,7 @@ public class LoginController {
             )
     })
     @GetMapping(value = "/validate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<UserResponseDTO>> login(
+    public Mono<ResponseEntity<Object>> login(
             @RequestHeader("Authorization") String authHeader) {
         log.info("Iniciando proceso de login");
         return loginService.login(authHeader)
@@ -112,7 +112,7 @@ public class LoginController {
             )
     })
     @PostMapping(value = "/authenticate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<UserResponseDTO>> loginWithCredentials(
+    public Mono<ResponseEntity<Object>> loginWithCredentials(
             @Valid @RequestBody LoginRequestDTO request) {
         log.info("Iniciando proceso de login con credenciales para email: {}", request.getEmail());
         return loginService.loginWithCredentials(request)
