@@ -300,13 +300,7 @@ La contraseña debe cumplir los siguientes criterios:
 ### Estructura de Error
 ```json
 {
-  "error": [
-    {
-      "timestamp": "2025-08-08T10:30:00.000+00:00",
-      "codigo": 400,
-      "detail": "La contraseña debe tener una letra mayúscula, una minúscula, exactamente dos números no consecutivos y tener entre 8 y 12 caracteres"
-    }
-  ]
+  "mensaje": "La contraseña debe tener una letra mayúscula, una minúscula, exactamente dos números no consecutivos y tener entre 8 y 12 caracteres"
 }
 ```
 
